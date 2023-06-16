@@ -83,7 +83,7 @@
 
 
     <div>
-        <input type="text" id="searchInput" placeholder="Enter a recipe" />
+        <input type="text" id="searchInput" placeholder="Enter" />
 
 
 
@@ -162,98 +162,99 @@
     </div>
     <div id="recipeResults"></div>
 
-    <script>
-        function fetchRecipes(query) {
-            var url = 'https://api.spoonacular.com/food/search';
-            var apiKey = 'd6de2258464e4727b386400091eca591'; // Replace with your API key
+   <script>
+    function fetchRecipes(query) {
+      var url = 'https://api.spoonacular.com/food/search';
+      var apiKey = 'd6de2258464e4727b386400091eca591'; // Replace with your API key
 
-            var queryParams = {
-                query: query,
-                number: 2,
-                apiKey: apiKey
-            };
+      var queryParams = {
+        query: query,
+        number: 2,
+        apiKey: apiKey
+      };
 
-            // Build query string from query parameters
-            var queryString = Object.keys(queryParams).map(function (key) {
-                return encodeURIComponent(key) + '=' + encodeURIComponent(queryParams[key]);
-            }).join('&');
+      // Build query string from query parameters
+      var queryString = Object.keys(queryParams).map(function (key) {
+        return encodeURIComponent(key) + '=' + encodeURIComponent(queryParams[key]);
+      }).join('&');
 
-            fetch(url + '?' + queryString)
-                .then(response => response.json())
-                .then(data => {
-                    var recipeResults = document.getElementById('recipeResults');
-                    recipeResults.innerHTML = '';
+      fetch(url + '?' + queryString)
+        .then(response => response.json())
+        .then(data => {
+          var recipeResults = document.getElementById('recipeResults');
+          recipeResults.innerHTML = '';
 
-                    var sections = data.searchResults;
-                    sections.forEach(function (section) {
-                        var sectionContainer = document.createElement('div');
-                        sectionContainer.className = 'section';
+          var sections = data.searchResults;
+          sections.forEach(function (section) {
+            var sectionContainer = document.createElement('div');
+            sectionContainer.className = 'section';
 
-                        var sectionTitle = document.createElement('h2');
-                        sectionTitle.className = 'section-title';
-                        sectionTitle.textContent = section.name;
+            var sectionTitle = document.createElement('h2');
+            sectionTitle.className = 'section-title';
+            sectionTitle.textContent = section.name;
 
-                        sectionContainer.appendChild(sectionTitle);
+            sectionContainer.appendChild(sectionTitle);
 
-                        if (section.results && section.results.length > 0) {
-                            section.results.forEach(function (result) {
-                                var recipeContainer = document.createElement('div');
-                                recipeContainer.className = 'recipe-container';
+            if (section.results && section.results.length > 0) {
+              section.results.forEach(function (result) {
+                var recipeContainer = document.createElement('div');
+                recipeContainer.className = 'recipe-container';
 
-                                var title = document.createElement('h3');
-                                title.textContent = result.name;
+                var title = document.createElement('h3');
+                title.textContent = result.name;
 
-                                if (result.image) {
-                                    var image = document.createElement('img');
-                                    image.src = result.image;
-                                    recipeContainer.appendChild(image);
-                                }
-
-                                var content = document.createElement('p');
-                                content.textContent = result.content || '';
-
-                                var link = document.createElement('a');
-                                link.href = result.link;
-                                link.textContent = 'Read More';
-
-                                recipeContainer.appendChild(title);
-                                recipeContainer.appendChild(content);
-                                recipeContainer.appendChild(link);
-
-                                sectionContainer.appendChild(recipeContainer);
-                            });
-                        } else {
-                            var noResults = document.createElement('p');
-                            noResults.textContent = 'No results found.';
-                            sectionContainer.appendChild(noResults);
-                        }
-
-                        recipeResults.appendChild(sectionContainer);
-                    });
-                })
-                .catch(error => {
-                    console.log('Error fetching recipes:', error);
-                });
-        }
-
-        function searchRecipes() {
-            var searchInput = document.getElementById('searchInput');
-            var query = searchInput.value;
-
-            if (query.trim() !== '') {
-                fetchRecipes(query);
-            }
-        }
-
-        window.onload = function () {
-            var searchInput = document.getElementById('searchInput');
-            searchInput.addEventListener('keypress', function (event) {
-                if (event.key === 'Enter') {
-                    searchRecipes();
+                if (result.image) {
+                  var image = document.createElement('img');
+                  image.src = result.image;
+                  recipeContainer.appendChild(image);
                 }
-            });
-        };
-    </script>
+
+                var content = document.createElement('p');
+                content.textContent = result.content || '';
+                removeHtmlTags(content); // Remove HTML tags
+
+                recipeContainer.appendChild(title);
+                recipeContainer.appendChild(content);
+
+                sectionContainer.appendChild(recipeContainer);
+              });
+            } else {
+              var noResults = document.createElement('p');
+              noResults.textContent = 'No results found.';
+              sectionContainer.appendChild(noResults);
+            }
+
+            recipeResults.appendChild(sectionContainer);
+          });
+        })
+        .catch(error => {
+          console.log('Error fetching recipes:', error);
+        });
+    }
+
+    function searchRecipes() {
+      var searchInput = document.getElementById('searchInput');
+      var query = searchInput.value;
+
+      if (query.trim() !== '') {
+        fetchRecipes(query);
+      }
+    }
+
+    window.onload = function () {
+      var searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('keypress', function (event) {
+        if (event.key === 'Enter') {
+          searchRecipes();
+        }
+      });
+    }
+
+    function removeHtmlTags(element) {
+      var strippedText = element.textContent.replace(/<[^>]+>/g, '');
+      element.textContent = strippedText;
+    }
+  </script>
 </body>
 
 </html>
